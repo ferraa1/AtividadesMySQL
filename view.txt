@@ -1,0 +1,188 @@
+CREATE or replace VIEW v_prod_bosch AS
+SELECT pro.nome_pro, pro.preco_pro
+FROM marca mar JOIN produto pro ON mar.pk_marca = pro.fk_marca
+WHERE mar.nome_mar = 'Bosch';
+
+desc v_prod_bosch;
+
+-----------------------------------------------------
+
+CREATE or replace VIEW v_maior_categoria (Categoria, Maior_preco) AS
+SELECT c.nome_cat, MAX(p.preco_pro)
+FROM categoria c join produto p ON c.pk_categoria = p.fk_categoria
+GROUP by 1 order by 1;
+
+update categoria
+set nome_cat = 'aspiradores de pó'
+where nome_cat = 'aspiradores de po';
+
+select * from v_maior_categoria;
+
+update produto
+set preco_pro = preco_pro * 1.1
+where fk_categoria = 9;
+
+... WITH CHECK OPTION;
+
+DROP VIEW v_estoque_maior_100;
+DROP VIEW v_media_categoria;
+
+-----------------------------------------------------
+--EXERCICIOS
+-----------------------------------------------------
+
+1) Que liste o código e nome dos produtos com
+preço superior a 100 reais;
+
+create or replace view exercicio_um as
+select pk_produto, nome_pro
+from produto
+where preco_pro > 100;
+select * from exercicio_um;
+
+2) Que liste todos os nomes de produtos de
+fornecedores de Blumenau;
+
+create or replace view exercicio_dois as
+select pro.nome_pro
+from produto pro join forn_prod fopro on pro.pk_produto = fopro.fk_produto
+join fornecedor forn on forn.pk_fornecedor = fopro.fk_fornecedor
+join cidade cid on cid.pk_cidade = forn.fk_cidade
+where cid.nome_cid = 'Blumenau';
+select * from exercicio_dois;
+
+3) Que liste todos os códigos e nomes de produtos
+da categoria geradores ou motoserras;
+
+create or replace view exercicio_tres as
+select pro.nome_pro
+from produto pro join categoria cat on cat.pk_categoria = pro.fk_categoria
+where cat.nome_cat in ('geradores', 'motoserras');
+select * from exercicio_tres;
+
+4) Que liste o nome e a data de nascimento de todos
+os colaboradores.
+
+create or replace view exercicio_quatro(Nome, Data_de_Nascimento) as
+select nome_col, nasc_col
+from colaborador
+order by 1;
+select * from exercicio_quatro;
+
+5) Que liste o faturamento para todas as ordens de
+serviço emitidas em 2012, agrupando por cidade;
+
+create or replace view exercicio_cinco(Soma, Cidade) as
+select sum(ite.quantidade * ite.preco), cid.nome_cid
+from item ite join ordem_servico os on os.pk_os = ite.fk_os
+join cliente cli on cli.pk_cliente = os.fk_cliente
+join cidade cid on cid.pk_cidade = cli.fk_cidade
+where year(os.abertura_os) = 2012
+group by 2
+order by 2;
+select * from exercicio_cinco;
+
+6) Que liste a média de preço dos produtos por
+fornecedor;
+
+create or replace view exercicio_seis(Media, Fornecedor) as
+select avg(pro.preco_pro), forn.pk_fornecedor
+from fornecedor forn join forn_prod fp on forn.pk_fornecedor = fp.fk_fornecedor
+join produto pro on pro.pk_produto = fp.fk_produto
+group by 2
+order by 2;
+select * from exercicio_seis;
+
+7) Que liste (nome categoria e max de preco), agrupados pela
+categoria.
+
+create or replace view exercicio_sete as
+select cat.nome_cat, max(pro.preco_pro)
+from produto pro join categoria cat where cat.pk_categoria = pro.fk_categoria
+group by cat.pk_categoria
+order by 2 desc;
+select * from exercicio_sete;
+
+8 Crie uma view que liste os cinco clientes, com maior
+faturamento em ago/11.
+
+create or replace view exercicio_oito(Nome, Faturamento) as
+select cli.nome_cli, sum(it.quantidade*it.preco)
+from cliente cli join ordem_servico os on cli.pk_cliente = os.fk_cliente
+join item it on os.pk_os = it.fk_os
+where month(os.abertura_os) = 8 and year(os.abertura_os) = 2011
+group by cli.pk_cliente
+order by 2 desc
+limit 5;
+select * from exercicio_oito;
+
+9 Crie uma view que contenha o número das ordens de
+serviço e seus totais;
+
+create or replace view exercicio_nove(Número, Total) as
+select os.pk_os, sum(it.quantidade*it.preco)
+from ordem_servico os join item it on os.pk_os = it.fk_os
+group by os.pk_os;
+select * from exercicio_nove;
+
+10 Crie uma view com os nomes e faturamentos dos dez
+piores produtos comercializados em 2012;
+
+create or replace view exercicio_dez as
+select pro.nome_pro, sum(it.quantidade*it.preco)
+from produto pro join item it on pro.pk_produto = it.fk_produto
+join ordem_servico os on os.pk_os - it.fk_os
+where year(os.abertura_os) = 2012
+group by pro.pk_produto
+limit 10;
+select * from exercicio_dez;
+
+11 Crie uma view com as três piores marcas em
+faturamento nesse ano.
+
+create or replace view exercicio_onze as
+select mar.nome_mar, sum(it.quantidade*it.preco)
+from marca mar join produto pro on mar.pk_marca = pro.fk_marca
+join item it on pro.pk_produto = it.fk_produto
+join ordem_servico os on os.pk_os - it.fk_os
+where year(os.abertura_os) = 2019
+group by mar.pk_marca
+limit 3;
+select * from exercicio_onze;
+
+12 Liste alfabeticamente, pelo nome do produto, seu
+código, nome do produto, nome da categoria e
+marca. Em caso de produtos com o mesmo nome,
+ordene alfabeticamente pela categoria.
+
+13 Liste o alfabeticamente o nome dos colaboradores, seu
+nascimento e o nome da sua cidade.
+
+14 Liste alfabeticamente a razão social dos fornecedores
+que vendam produtos da marca Bosch.
+
+15 Liste, ordenando pelo código, os produtos que possuam
+ICMS igual a 25. Acrescente o nome da marca e sua
+categoria.
+
+16 Liste alfabeticamente os fornecedores da marca Makita
+que ofereçam prazo superior a 10 dias.
+
+17 Liste o nome dos fornecedores que não sejam de
+Florianópolis, São José ou Palhoça.
+
+18 Liste o faturamento BRUTO por produto nesse ano,
+mas apenas dos dez melhores produtos;
+
+19 Liste o faturamento BRUTO dos 5 melhores clientes
+desse ano, mas apenas os da cidade de Florianópolis,
+Palhoça ou Biguaçu.
+
+20 Considere que a comissão de cada colaborador que
+emite uma ordem de serviço seja de 2,5% sobre o
+faturamento BRUTO. Liste os cinco colaboradores com
+melhor faturamento no ano passado.
+
+21 Liste o faturamento BRUTO desse ano, agrupe por
+marca. Limite o resultado as cinco melhores marcas.
+

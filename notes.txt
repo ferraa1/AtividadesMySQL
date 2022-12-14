@@ -1,0 +1,515 @@
+--avg
+--count
+--min
+--max
+--sum
+--round
+
+select cat.nome_cat, count(cat.pk_categoria)
+from categoria cat join produto pro on cat.pk_categoria = pro.fk_categoria
+group by cat.pk_categoria
+order by 2;
+
+--{REVISÃO GROUP BY}--
+
+1)
+
+select cli.nome_cli
+from cidade cid join cliente cli on cid.pk_cidade = cli.fk_cidade
+where cid.nome_cid = 'Blumenau'
+order by 1;
+
+select count cliente;
+
+select pk_cidade
+from cidade
+where nome_cid = 'Blumenau'
+group by 1;
+
+select cid.pk_cidade,cid.nome_cid, count(cli.pk_cliente)
+from cidade cid join cliente cli on cid.pk_cidade = cli.fk_cidade
+group by cid.pk_cidade
+order by 3 desc;
+
+select cat.nome_cat, count(pro.pk_produto)
+from produto pro join categoria cat on pro.fk_categoria = cat.pk_categoria
+group by cat.pk_categoria
+order by 2;
+
+select mar.nome_mar,count(pro.pk_produto)
+from marca mar join produto pro on pro.fk_marca = mar.pk_marca
+group by mar.pk_marca
+order by 2;
+
+select mar.nome_mar, avg(pro.preco_pro), count(pro.pk_produto)
+from marca mar join produto pro on pro.fk_marca = mar.pk_marca
+group by mar.pk_marca
+order by 2;
+
+select mar.nome_mar,
+round(avg(pro.preco_pro),2) as 'Média de preços'
+from marca mar join produto pro on mar.pk_marca = pro.fk_marca
+group by mar.pk_marca
+order by 1; atruk
+
+2)
+
+select cat.nome_cat, min(pro.preco_pro)
+from categoria cat join produto pro on cat.pk_categoria = pro.fk_categoria
+group by cat.pk_categoria
+order by 1;
+
+3)
+
+select cat.nome_cat, max(pro.preco_pro)
+from categoria cat join produto pro on cat.pk_categoria = pro.fk_categoria
+group by cat.pk_categoria
+order by 2 desc;
+
+update categoria
+set nome_cat = 'aspiradores de pó'
+where nome_cat = 'aspiradores de po';
+
+4)
+
+select fo.razao_for, sum(fp.preco)
+from fornecedor fo join forn_prod fp on fo.pk_fornecedor = fp.fk_fornecedor
+join cidade cid on cid.pk_cidade = fo.fk_cidade
+where cid.nome_cid in('Joinville','Rio do Sul','Blumenau')
+group by fo.pk_fornecedor
+order by 2;
+
+--
+
+select os.pk_os, count(it.pk_item)
+from ordem_servico os join item it on os.pk_os = it.fk_os
+where os.pk_os = 50
+group by 1;
+
+select os.pk_os, it.quantidade, it.preco, it.quantidade * it.preco
+from ordem_servico os join item it on os.pk_os = it.fk_os
+where os.pk_os = 45;
+
+select os.pk_os, sum(it.preco * it.quantidade)
+from ordem_servico os join item it on os.pk_os = it.fk_os
+where os.pk_os = 45
+group by 1;
+
+-----------------------------------------------------------------------------------------
+
+Exercícios consulta de faturamento:
+
+1)
+select cat.nome_cat, sum(it.preco * it.quantidade)
+from ordem_servico os join item it on os.pk_os = it.fk_os
+join produto pro on pro.pk_produto = it.fk_produto
+join categoria cat on cat.pk_categoria = pro.fk_categoria
+where year(os.abertura_os) = 2012
+group by cat.pk_categoria
+order by 1;
+
+2)
+select mar.nome_mar, sum(it.preco * it.quantidade)
+from marca mar join produto pro on mar.pk_marca = pro.fk_marca
+join item it on pro.pk_produto = it.fk_produto
+join ordem_servico os on os.pk_os = it.fk_os
+where year(os.abertura_os) = 2000
+and month(os.abertura_os) between 1 and 3
+group by mar.pk_marca
+order by 1;
+
+3)
+select os.abertura_os, sum(it.quantidade*it.preco)
+from item it join ordem_servico os on it.fk_os = os.pk_os
+where year(os.abertura_os)=2012
+group by month(os.abertura_os)
+order by 1;
+
+4)
+select year(abertura_os), sum(it.preco * it.quantidade)
+from item it join ordem_servico os on it.fk_os = os.pk_os
+where year(abertura_os) between 2000 and 2005
+group by 1
+order by 1;
+
+5)
+select cid.pk_cidade, cid.nome_cid, sum(it.preco*it.quantidade)
+from item it join ordem_servico os on it.fk_os = os.pk_os
+join cliente cli on cli.pk_cliente = os.fk_cliente
+join cidade cid on cid.pk_cidade = cli.fk_cidade
+group by 1
+order by 3 desc;
+
+6)
+select pro.nome_pro, sum(it.preco * it.quantidade)
+from produto pro join item it on pro.pk_produto = it.fk_produto
+join ordem_servico os on os.pk_os = it.fk_os
+where year(os.abertura_os) = 2000
+group by 1
+order by 1
+limit 10;
+
+7)
+select col.nome_col, sum(it.preco * it.quantidade)
+from  colaborador col join ordem_servico os on col.pk_colaborador = os.fk_colaborador
+
+-----------------------------------------------------------------------------------------
+
+9)
+select pro.nome_pro, sum(it.quantidade * it.preco)
+from produto pro join item it on pro.pk_produto = it.fk_produto
+join ordem_servico os on os.pk_os = it.fk_os
+join cliente cli on cli.pk_cliente = os.fk_cliente
+join cidade cid on cid.pk_cidade = cli.fk_cidade
+where cid.nome_cid in('Blumenau','Ibirama','Rio do Sul')
+and os.abertura_os like ('2000-%-%')
+group by 1
+order by 2 asc
+limit 3;
+
+10)
+select cid.nome_cid, sum(it.quantidade * it.preco)
+from cidade cid join cliente cli on cid.pk_cidade = cli.fk_cidade
+join ordem_servico os on cli.pk_cliente = os.fk_cliente
+join item it on os.pk_os = it.fk_os
+where os.abertura_os like ('2000-%-%')
+group by 1
+order by 2 desc
+limit 3;
+
+11)
+select col.nome_col, 0.025 * (sum(it.quantidade * it.preco))
+from colaborador col join ordem_servico os on col.pk_colaborador = os.fk_colaborador
+join item it on os.pk_os = it.fk_os
+where col.pk_colaborador = 18 and year(os.abertura_os) = 2005
+group by 1
+order by 2;
+
+-----------------------------------------------------------------------------------------
+
+1)Liste os cinco clientes que mais pagaram diárias na locação de veículos neste ano;
+
+select cli.nome_cli, sum(con.valor_con)
+from cliente cli join contrato con on cli.pk_cliente = con.fk_cliente
+group by 1
+order by 2 desc
+limit 5;
+
+2)Liste os dez veículos da marca Fiat ou GM que mais gastaram em manutenção, mas apenas com peças no ano passado;
+ 
+select vei.placa_vei, vei.modelo_vei, vei.marca_vei, sum(pm.quantidade * pm.preco)
+from veiculo vei join manutencao man on vei.pk_veiculo = man.fk_veiculo
+join pec_man pm on man.pk_manutencao = pm.fk_manutencao
+where vei.marca_vei in('Fiat','GM') and year(man.data_man) = 2018
+group by vei.pk_veiculo
+order by 4 desc
+limit 10;
+
+3)Liste as cinco cores de veículos que mais foram locadas nos últimos 5 anos por mulheres;
+
+select vei.cor_vei, count(cli.pk_cliente)
+from veiculo vei join contrato con on vei.pk_veiculo = con.fk_veiculo
+join cliente cli on cli.pk_cliente = con.fk_cliente
+where year(con.dt_con) between 2015 and 2019
+group by vei.cor_vei
+order by 2 desc
+limit 5;
+
+4)Liste a média no valor dos seguros feitos nos últimos 2 anos, agrupando por marca de veículo;
+
+select vei.marca_vei, avg(con.seguro_cont)
+from veiculo vei join contrato con on vei.pk_veiculo
+where year(con.dt_con) >= 2017
+group by 1;
+
+5)Liste as 10 peças com maior valor monetário em estoque;
+
+select pec.nome_pec, sum(pec.preco_pec * pec.estoque_pec)
+from peca pec
+group by pec.pk_peca
+order by 2 desc
+limit 10;
+
+6)Liste nome e telefone dos cinco fornecedores que mais forneceram veículos da marca Audi no ano passado;
+
+select fo.nome_for, fo.fone_for, count(vei.pk_veiculo)
+from fornecedor fo join veiculo vei on fo.pk_fornecedor = vei.fk_fornecedor
+where vei.marca_vei = 'Audi' and year(vei.dt_compra_vei) = 2018
+group by fo.pk_fornecedor
+order by 3 desc
+limit 5;
+
+7)Liste os nomes de fornecedores que vendam peças que contenham a string filtro, mas apenas para as peças que tenham menos de 5 unidades em estoque. Filtre apenas fornecedores que vendam essas peças entre R$10 e R$20 e ofertem um prazo de pagamento acima de 30 dias;
+
+select fo.nome_for 
+from fornecedor fo join for_pec fp on fo.pk_fornecedor = fp.fk_fornecedor
+join peca pec on pec.pk_peca = fp.fk_peca
+where pec.estoque_pec < 5
+and pec.preco_pec between 10 and 20
+and fp.prazo > 30
+and pec.nome_pec like ('%filtro%')
+group by fo.pk_fornecedor
+order by 1;
+
+8)Liste a placa dos 10 veículos que necessitaram a maior quantidade de peças em manutenções no ano passado;
+
+select vei.placa_vei, count(pm.quantidade)
+from veiculo vei join manutencao man on vei.pk_veiculo = man.fk_veiculo
+join pec_man pm on man.pk_manutencao = pm.fk_manutencao
+where year(man.data_man) = 2018
+group by vei.pk_veiculo
+order by 2 desc
+limit 10;
+
+9)Liste a placa dos 10 veículos com as manutenções mais caras, tanto em peças quanto em serviço.
+
+select vei.placa_vei, sum((pm.quantidade * pm.preco) + (ms.horas * ms.valor_hora))
+from veiculo vei join manutencao man on vei.pk_veiculo = man.fk_veiculo
+join pec_man pm on man.pk_manutencao = pm.fk_manutencao
+join man_ser ms on man.pk_manutencao = ms.fk_manutencao
+group by vei.pk_veiculo
+order by 1 desc
+limit 10;
+
+10)Liste a quantidade de contratos emitidos no ano passado para veículoas da marca Audi ou BMW. Agrupe o resultado pelo sexo do cliente.
+
+select count(con.pk_contrato)
+from contrato con join veiculo vei on vei.pk_veiculo = con.fk_veiculo
+join cliente cli on cli.pk_cliente = con.fk_cliente
+where year(con.dt_con) = 2018
+and vei.marca_vei in ('Audi','BMW')
+group by cli.sexo_cli
+order by 1;
+
+11)Liste o total gasto em aquisições de veículos nos últimos 5 anos.
+
+select sum(vei.valor_compra_vei)
+from veiculo vei
+where year(vei.dt_compra_vei) between 2015 and 2019;
+
+12)Liste o nome e telefone dos fornecedores de todas as peças que tenham menos de 2 unidade em estoque. Filtre os fornecedores quem ofertem entre 15 e 30 dias de prazo para pagamento. A listagem deverá excluir as peças destinadas para veículos da marca Audi, BMW ou Volvo.
+
+select fo.nome_for, fo.fone_for
+from fornecedor fo join for_pec fp on fo.pk_fornecedor = fp.fk_fornecedor
+join peca pec on pec.pk_peca = fp.fk_peca
+join pec_man pm on pec.pk_peca = pm.fk_peca
+join manutencao man on man.pk_manutencao = pm.fk_manutencao
+join veiculo vei on vei.pk_veiculo = man.fk_veiculo
+where pec.estoque_pec < 2
+and fp.prazo between 15 and 30
+and vei.marca_vei not in ('Audi','BMW','Volvo')
+group by fo.pk_fornecedor
+order by 1;
+
+13)Liste as marcas dos 5 veículos com as manutenções mais baratas quem foram realizadas neste ano, tanto em peças quanto em serviço.
+
+select vei.marca_vei, sum((ms.horas * ms.valor_hora) + (pm.quantidade * pm.preco))
+from veiculo vei join manutencao man on vei.pk_veiculo = man.fk_veiculo
+join man_ser ms on man.pk_manutencao = ms.fk_manutencao
+join pec_man pm on man.pk_manutencao = pm.fk_manutencao
+where year(man.data_man) = 2019
+group by 1
+order by 2 asc
+limit 5;
+
+-----------------------------------------------------------------------------------------------
+--|#########################################################################################|--
+--|.........................................................................................|--
+--|,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$$$,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,|--
+--|.........................................................................................|--
+--|#########################################################################################|--
+--|.........................................................................................|--
+--|,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*Subquerys*,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,|--
+--|.........................................................................................|--
+--|#########################################################################################|--
+--|.........................................................................................|--
+--|,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,$$$,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,|--
+--|.........................................................................................|--
+--|#########################################################################################|--
+-----------------------------------------------------------------------------------------------
+
+--⣿⣿⣿⣿⡟⠄⣌⠻⣿⣿⣿⣿⣿⠟⠋⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿
+--⣿⣿⣿⣿⡇⢸⣭⡇⢽⣿⣿⠏⣀⣶⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿
+--⣿⣿⣿⣿⣷⣾⢿⣿⣿⣿⣿⣶⣭⣛⢃⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿
+--⣿⣿⡛⠈⠛⠁⠙⠉⠛⠿⠛⢟⡿⣿⣷⡝⢿⡿⢻⣿⣿⣿⣿⣿⣿
+--⣿⡹⠄⢀⣷⣶⣶⣿⣿⣿⣿⣷⣶⡍⠹⡿⠆⠙⣼⣿⣿⣿⣿⣿⣿
+--⢫⣷⣧⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⠄⠄⢀⣴⣶⣏⡛⢿⣿⣿⣿⣿
+--⢸⣿⣿⠛⠿⣿⣿⣿⣿⣿⣿⠿⠁⠄⠄⣾⣿⣿⣿⡟⣨⣿⣿⣿⣿
+--⡘⣿⣿⣧⣀⣀⣹⣏⢀⣀⣀⣀⣠⡄⢸⣿⣿⣿⣿⢀⣿⣿⣿⣿⣿
+--⣷⣼⣋⠈⣿⣿⣿⣿⣿⣿⣿⣿⠟⠄⠈⠛⢿⠏⢙⠈⠁⠄⠙⣿⣿
+--⣿⣿⣿⠄⠹⠟⠛⠉⠡⠿⣿⡏⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠘⣿
+--⣿⣿⠿⠃⠄⠄⣀⡀⠄⠄⠈⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢹
+--⠄⠄⢀⡆⣰⠟⠷⣤⠤⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+--⠄⢀⠎⠄⠃⢀⠞⠉⢳⣴⣶⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣀
+
+1) Liste alfabeticamente o nome dos clientes que residam em Joinville, Jaraguá do Sul, Blumenau e Chapecó;
+
+select cli.nome_cli
+from cliente cli join cidade cid on cid.pk_cidade = cli.fk_cidade
+where cid.nome_cid in('Joinville','Jaraguá do Sul','Blumenau','Chapecó')
+order by 1;
+
+select cli.nome_cli
+from cliente cli
+where cli.fk_cidade in(
+ select cid.pk_cidade
+ from cidade cid
+ where cid.nome_cid
+ in('Joinville','Jaraguá do Sul','Blumenau','Chapecó')
+ )
+order by 1;
+
+2) Liste alfabeticamente o nome dos produtos da marca Bosch, com preço superior a 100 reais.
+
+select nome_pro
+from produto
+where preco_pro > 100
+and fk_marca in(
+ select pk_marca
+ from marca
+ where nome_mar = 'Bosch'
+ )
+order by 1;
+
+3) Liste código e nome dos produtos da categoria geradores ou tratores de grama
+
+select pk_produto, nome_pro from produto
+where fk_categoria in(
+ select pk_categoria from categoria
+ where nome_cat in('geradores','tratores de grama')
+ )
+order by 2;
+
+4) Liste o número das ordens de serviço do cliente que começam seu nome com Elvis;
+
+select pk_os
+from ordem_servico
+where fk_cliente in(
+ select pk_cliente from cliente
+ where nome_cli like 'Elvis%'
+ );
+
+5) Liste alfabeticamente a razão social e e-mail dos fornecedores de Sao Paulo, Rio de Janeiro ou Natal.
+
+select razao_for, email_for
+from fornecedor
+where fk_cidade in(
+ select pk_cidade
+ from cidade
+ where nome_cid in('São Paulo', 'Rio de Janeiro', 'Natal')
+ )
+order by pk_fornecedor;
+
+6) Liste o número das ordens de serviço emitidas por colaboradores que iniciem seu nome com Emma, mas apenas as que foram registradas entre jan/2012 e dez/2012.
+
+select pk_os
+from ordem_servico
+where abertura_os like '2012-%-%'
+and fk_colaborador in(
+ select pk_colaborador
+ from colaborador
+ where nome_col like 'Emma%'
+ );
+
+7) Liste alfabeticamente a razão social e e-mail dos fornecedores de Blumenau;
+
+select razao_for, email_for
+from fornecedor
+where fk_cidade in(
+ select pk_cidade from cidade
+ where nome_cid = 'blumenau'
+ )
+order by pk_fornecedor;
+
+8) Liste alfabeticamente o nome dos clientes cadastrados nesse ano, mas apenas os das cidades vizinhas: Presidente Getúlio, Rio do Sul, Dona Emma, Apiúna e Lontras.
+
+select nome_cli
+from cliente
+where year(cadastro_cli) = 2019
+and fk_cidade in(
+ select pk_cidade
+ from cidade
+ where nome_cid in('Presidente Getúlio', 'Rio do Sul', 'Dona Emma', 'Apiúna', 'Lontras')
+ );
+
+9) Liste o código e nome dos produtos da marca Bosch que venderam mais de 100 unidades nas ordens de serviço do ano passado ao preço faturado de R$ 200,00
+
+select pk_produto, nome_pro
+from produto
+where fk_marca in(
+ select pk_marca
+ from marca
+ where nome_mar = 'Bosch'
+ )
+and pk_produto in(
+ select fk_produto
+ from item
+ where preco = 200
+ and quantidade > 100
+ and fk_os in(
+  select pk_os
+  from ordem_servico
+  where year(abertura_os) = 2010
+  ) 
+ );
+
+10) Liste o código, nome e preço dos dez produtos mais caros, mas apenas os que foram comprados por clientes ibiramenses neste ano.
+
+select pk_produto, nome_pro, preco_pro
+from produto
+where pk_produto
+ in(select fk_produto from item
+ where fk_os
+  in(select pk_os from ordem_servico
+  where fk_cliente
+   in(select pk_cliente from cliente
+   where fk_cidade
+    in(select pk_cidade from cidade
+    where nome_cid = 'Ibirama'
+    )
+   )
+  )
+ );
+
+11) Liste a razão social dos fornecedores de produtos da marca Bosch ou Makita que residam em Blumenau, Rio do Sul ou Ibirama. Mas apenas da categoria hidrolavadoras, ferramentas diversas ou motoserras.
+
+select razao_for
+from fornecedor
+where fk_cidade in(
+ select pk_cidade
+ from cidade
+ where nome_cid in('Blumenau','Rio do Sul','Ibirama')
+ ) and
+pk_fornecedor in(
+ select fk_fornecedor
+ from forn_prod
+ where fk_produto in(
+  select pk_produto
+  from produto
+  where fk_categoria in(
+   select pk_categoria
+   from categoria
+   where nome_cat in('hidrolavadoras','ferramentas diversas','motoserras')
+  ) and
+  fk_marca in(
+   select pk_marca
+   from marca
+   where nome_mar in('Bosch','Makita')
+  )
+ )
+)
+order by 1;
+
+12) Liste alfabeticamente pelo nome, os produtos da categoria Enlatados, Material de higiene ou Laticínios, mas apenas da marca “Tabajara Ltda.”, que possuam preço entre R$20,00 e R$50,00 e tenham atualmente acima de 100 unidades em estoque.
+
+select nome_pro
+from produto
+where fk_categoria in(select pk_categoria from categoria where nome_cat in('enlatados','material de higiene', 'laticínios')
+and fk_marca in(select pk_marca from marca where)
+
+order by 1;
+
+13) Considere o fato de que você é um colaborador cadastrado nesta empresa. Liste alfabeticamente o nome e e-mail dos clientes atendidos por você que sejam da cidade de Ibirama, Rio do Sul, Dona Emma, Apiúna ou Presidente Getúlio, que fizeram alguma compra no mês passado.
+
+
+

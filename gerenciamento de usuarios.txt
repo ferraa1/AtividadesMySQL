@@ -1,0 +1,160 @@
+GRANT/REVOKE - Privilégios/Comandos(campo da tabela)
+ON - Banco.Tabela
+TO/FROM - Usuário
+IDENTIFIED BY - 'senha'
+------------------------------------------------------------------------------------------
+GRANT ---
+ON ---
+TO ---
+IDENTIFIED BY ---
+;
+REVOKE ---
+ON ---
+FROM ---
+;
+------------------------------------------------------------------------------------------
+grant select , insert
+on generico.*
+to beltrano@localhost
+identified by '123';
+
+grant select (pk_marca, nome_mar)
+on generico.marca
+to ciclano@localhost
+identified by '123';
+
+drop user --;
+------------------------------------------------------------------------------------------
+USUÁRIO 1: Terá todos os privilégios em todo o database generico;
+
+grant all
+on generico.*
+to usuario1@localhost
+identified by '123';
+
+Faça o comando para excluir todos os registros da tabela marca. Explique a mensagem que retornou.
+
+delete from marca;
+--ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`generico`.`produto`, CONSTRAINT `produto_ibfk_1` FOREIGN KEY (`fk_marca`) REFERENCES `marca` (`pk_marca`) ON UPDATE CASCADE)
+
+Faça o comando em SQL que atualize o valor de pk_marca para o registro 'Makita' na tabela marca.
+
+update marca
+set pk_marca = 4
+where nome_mar = 'Makita';
+
+Faça o comando em SQL que liste todos os registros da tabela produto que tenham esta marca. Explique o que ocorreu nestes registros.
+
+select *
+from produto pro
+join marca mar on mar.pk_marca = pro.fk_marca
+where mar.nome_mar = 'Makita';
+
+------------------------------------------------------------------------------------------
+USUÁRIO 2: Terá privilégios limitados em todo o database, apenas select, insert e delete.
+
+grant select, insert, delete
+on generico.*
+to usuario2@localhost
+identified by '123';
+
+Faça o comando em SQL que insira uma nova categoria na base generico.
+
+insert into categoria (nome_cat, detalhes_cat) values ('Tratores', 'gerenciamento de usuarios');
+
+Faça o comando em SQL que altere todos os produtos da categoria motoserras para esta nova categoria.
+Explique a mensagem que ocorreu.
+
+update produto
+set fk_categoria = 11
+where fk_categoria = 8;
+--ERROR 1142 (42000): UPDATE command denied to user 'usuario2'@'localhost' for table 'produto'
+
+------------------------------------------------------------------------------------------
+USUÁRIO 3: terá apenas privilégios de insert, select e update nas tabelas PRODUTO, MARCA, CATEGORIA;
+
+grant insert, select, update
+on generico.produto
+to usuario3@localhost
+identified by '123';
+grant insert, select, update
+on generico.marca
+to usuario3@localhost
+identified by '123';
+grant insert, select, update
+on generico.categoria
+to usuario3@localhost
+identified by '123';
+
+Faça o comando em SQL que aumente os preços dos produtos acima de R$ 100,00 em 20%.
+
+update produto
+set preco_pro = preco_pro * 1.2
+where preco_pro > 100;
+
+------------------------------------------------------------------------------------------
+USUÁRIO 4: terá apenas privilégios de select  nas tabelas/campos PRODUTO (nome e preço), MARCA (nome e site), CATEGORIA(nome).
+
+grant select(nome_pro)
+on generico.produto
+to usuario4@localhost
+identified by '123';
+grant select(preco_pro)
+on generico.produto
+to usuario4@localhost
+identified by '123';
+grant select(nome_mar)
+on generico.marca
+to usuario4@localhost
+identified by '123';
+grant select(site_mar)
+on generico.marca
+to usuario4@localhost
+identified by '123';
+grant select(nome_cat)
+on generico.categoria
+to usuario4@localhost
+identified by '123';
+
+Faça o comando em SQL que liste o pk do produto, seu nome e preço. Explique a mensagem que retorna.
+
+select pk_produto, nome_pro, preco_pro
+from produto;
+
+------------------------------------------------------------------------------------------
+comandos REVOKE
+
+
+USUÁRIO 1
+Faça o comando em SQL que exclua todos os privilégios do usuário 1
+
+revoke all
+on generico.*
+from usuario1@localhost;
+
+------------------------------------------------------------------------------------------
+USUÁRIO 2
+Faça o comando em SQL que exclua o privilégio de exclusão neste database
+
+revoke delete
+on generico.*
+from usuario2@localhost;
+
+------------------------------------------------------------------------------------------
+USUÁRIO 3
+Retire todos os privilégios deste usuário para as tabelas marca e categoria.
+
+revoke all
+on generico.marca
+from usuario3@localhost;
+revoke all
+on generico.categoria
+from usuario3@localhost;
+
+------------------------------------------------------------------------------------------
+USUÁRIO 4
+Retire o privilégio de visualização do campo preço na tabela produto.
+
+revoke select(preco_pro)
+on generico.produto
+from usuario4@localhost

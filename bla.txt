@@ -1,0 +1,4 @@
+select cat.nome_cat, count(cat.pk_categoria)
+from categoria cat join produto pro on cat.pk_categoria = pro.fk_categoria
+group by cat.pk_categoria
+order by 2;

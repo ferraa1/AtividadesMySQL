@@ -1,0 +1,322 @@
+Stored Procedures
+
+DELIMITER $$
+
+drop procedure nomezin
+
+1) Que liste o código e nome dos produtos com
+preço superior a 100 reais;
+
+create procedure q01
+(v_preco decimal(10,2))
+begin
+select pk_produto, nome_pro
+from produto
+where preco_pro > v_preco
+order by 1;
+end $$
+
+call q01 (100) $$
+
+2) Que liste todos os nomes de produtos de
+fornecedores de Blumenau;
+
+create procedure q02
+(v_cidade varchar (20))
+begin
+select pro.nome_pro
+from produto pro join forn_prod fp on pro.pk_produto = fp.fk_produto
+join fornecedor fo on fo.pk_fornecedor = fp.fk_fornecedor
+join cidade ci on ci.pk_cidade = fo.fk_cidade
+where ci.nome_cid = v_cidade
+order by 1;
+end $$
+
+call q02 ('Blumenau') $$
+
+3) Que liste todos os códigos e nomes de produtos
+da categoria geradores ou motoserras;
+
+create procedure q03
+(v_cat1 varchar(45), v_cat2 varchar(45))
+begin
+select pro.pk_produto, pro.nome_pro
+from produto pro join categoria cat on cat.pk_categoria = pro.fk_categoria
+where cat.nome_cat in(v_cat1, v_cat2)
+order by 1;
+end $$
+
+call q03 ('geradores', 'motoserras') $$
+
+4) Que liste o nome e a data de nascimento de todos
+os colaboradores ao informar o ano de nascimento e a cidade.
+
+create procedure q04
+(v_ano int, v_cidade varchar(45))
+begin
+select col.nome_col, col.nasc_col
+from colaborador col join cidade cid on cid.pk_cidade = col.fk_cidade
+where year(col.nasc_col) = v_ano and cid.nome_cid = v_cidade
+order by 1;
+end $$
+
+call q04 (1985, 'Blumenau') $$
+
+5) Que liste o faturamento para todas as ordens de
+serviço emitidas em 2012, agrupando por cidade;
+
+create procedure q05
+(v_ano int)
+begin
+select sum(it.quantidade * it.preco), cid.pk_cidade
+from item it join ordem_servico os on os.pk_os = it.fk_os
+join cliente cli on cli.pk_cliente = os.fk_cliente
+join cidade cid on cid.pk_cidade = cli.fk_cidade
+where year(os.abertura_os) = v_ano
+group by 2
+order by 1;
+end $$
+
+call q05 (2012) $$
+
+6) Que liste a média de preço dos produtos por
+fornecedor;
+
+create procedure q06
+(v_fornecedor varchar(45))
+begin
+select fo.pk_fornecedor, fo.razao_for, avg(pro.preco_pro)
+from fornecedor fo join forn_prod fopr on fo.pk_fornecedor = fopr.fk_fornecedor
+join produto pro on  pro.pk_produto = fopr.fk_produto
+join item it on pro.pk_produto = it.fk_produto
+where fo.razao_for = v_fornecedor
+group by 1
+order by 2;
+end $$
+
+call q06 ('mollis. Duis sit amet') $$
+
+7) Que liste o nome, o preço e o nome da categoria
+dos produtos mais caros, agrupados pela categoria.
+
+create procedure q07
+(v_categoria varchar(45))
+begin
+select pro.nome_pro, max(pro.preco_pro), cat.nome_cat
+from produto pro join categoria cat
+where cat.nome_cat = v_categoria
+group by 1
+order by 2 desc;
+end $$
+
+call q07 ('motoserras') $$
+
+8) Crie uma view que liste os cinco clientes, com maior
+faturamento em ago/11.
+
+create procedure q08
+(v_mes int, v_ano int)
+begin
+select cli.nome_cli
+from cliente cli join ordem_servico os on cli.pk_cliente = os.fk_cliente
+join item it on os.pk_os = it.fk_os
+where month(os.abertura_os) = v_mes and year(os.abertura_os) = v_ano
+order by 1
+limit 5;
+end $$
+
+call q08 (08, 2011) $$
+
+9) Crie uma view que contenha o número das ordens de
+serviço e seus totais;
+
+create procedure q09
+(v_ano int)
+begin
+select os.pk_os, (it.quantidade * it.preco)
+from ordem_servico os join item it on os.pk_os = it.fk_os
+where year(os.abertura_os) = v_ano
+order by 1;
+end $$
+
+call q09 (1999) $$
+
+10) Crie uma view com os nomes e faturamentos dos dez
+piores produtos comercializados em 2012;
+
+create procedure q10
+(v_ano int)
+begin
+select pro.pk_produto, pro.nome_pro, sum(it.quantidade * it.preco)
+from produto pro join item it on pro.pk_produto = it.fk_produto
+join ordem_servico os on os.pk_os = it.fk_os
+where year(os.abertura_os) = v_ano
+group by 1
+order by 3;
+end $$
+
+call q10 (2012) $$
+
+11) Crie uma view com as três piores marcas em
+faturamento nesse ano.
+
+create procedure q11
+(v_ano int)
+begin
+
+end $$
+
+call q11 () $$
+
+12) Liste alfabeticamente, pelo nome do produto, seu
+código, nome do produto, nome da categoria e
+marca. Em caso de produtos com o mesmo nome,
+ordene alfabeticamente pela categoria.
+
+create procedure q12
+()
+begin
+end $$
+
+call q12 () $$
+
+13) Liste o alfabeticamente o nome dos colaboradores, seu
+nascimento e o nome da sua cidade.
+
+create procedure q13
+()
+begin
+end $$
+
+call q13 () $$
+
+14) Liste alfabeticamente a razão social dos fornecedores
+que vendam produtos da marca Bosch.
+
+create procedure q14
+()
+begin
+end $$
+
+call q14 () $$
+
+15) Liste, ordenando pelo código, os produtos que possuam
+ICMS igual a 25. Acrescente o nome da marca e sua
+categoria.
+
+create procedure q15
+()
+begin
+end $$
+
+call q15 () $$
+
+16) Liste alfabeticamente os fornecedores da marca Makita
+que ofereçam prazo superior a 10 dias.
+
+create procedure q16
+()
+begin
+end $$
+
+call q16 () $$
+
+17) Liste o nome dos fornecedores que não sejam de
+Florianópolis, São José ou Palhoça.
+
+create procedure q17
+()
+begin
+end $$
+
+call q17 () $$
+
+18) Liste o faturamento BRUTO por produto nesse ano,
+mas apenas dos dez melhores produtos;
+
+create procedure q18
+()
+begin
+end $$
+
+call q18 () $$
+
+19) Liste o faturamento BRUTO dos 5 melhores clientes
+desse ano, mas apenas os da cidade de Florianópolis,
+Palhoça ou Biguaçu.
+
+create procedure q19
+()
+begin
+end $$
+
+call q19 () $$
+
+20) Considere que a comissão de cada colaborador que
+emite uma ordem de serviço seja de 2,5% sobre o
+faturamento BRUTO. Liste os cinco colaboradores com
+melhor faturamento no ano passado.
+
+create procedure q20
+()
+begin
+end $$
+
+call q20 () $$
+
+21) Liste o faturamento BRUTO desse ano, agrupe por
+marca. Limite o resultado as cinco melhores marcas.
+
+create procedure q21
+()
+begin
+end $$
+
+call q21 () $$
+
+----------------------------------------------------------------------------
+Liste a quantidade de contratos emitidos no ano informado pelo usuário para veículos de duas marcas.
+Agrupe o resultado pelo sexo do cliente. 
+
+create procedure sp1
+(v_ano int, v_marca1 varchar(45), v_marca2 varchar(45))
+begin
+select count(con.pk_contrato), cli.sexo_cli
+from contrato con join cliente cli on cli.pk_cliente = con.fk_cliente
+join veiculo vei on vei.pk_veiculo = con.fk_veiculo
+where year(con.dt_con) = v_ano and (vei.marca_vei = v_marca1 or vei.marca_vei = v_marca2)
+group by 2
+order by 1;
+end $$
+
+call sp1 (2001, 'Chevrolet', 'Bosche') $$
+
+Liste o total gasto em aquisições de veículos entre dois anos informados pelo usuário agrupando por ano e ordenando de modo ascendente pelo ano.
+
+create procedure sp2
+()
+begin
+end $$
+
+call sp2 () $$
+
+Liste o nome e telefone dos fornecedores de todas as peças que tenham a quantidade mínima informada pelo usuário em estoque.
+Filtre os fornecedores que ofertem entre dois prazos para pagamento também informados.
+A listagem deverá excluir as peças destinadas para veículos de uma marca também informada.
+
+create procedure sp3
+()
+begin
+end $$
+
+call sp3 () $$
+
+Liste as marcas dos 10 veículos com as manutenções mais baratas que foram realizadas num ano informado pelo usuário tanto em peças
+quanto em serviço.
+
+create procedure sp4
+()
+begin
+end $$
+
+call sp4 () $$

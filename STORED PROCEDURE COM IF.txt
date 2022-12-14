@@ -1,0 +1,26 @@
+DELIMITER $$
+create procedure exemplo
+(exemplo_ano int)
+begin
+
+declare exemplo_faturamento decimal(10,2);
+select sum(it.preco * it.quantidade)
+into exemplo_faturamento
+from produto pro join item it on pro.pk_produto = it.fk_produto join ordem_servico os on os.pk_os = it.fk_os
+where year(os.abertura_os) = exemplo_ano
+
+if (exemplo_faturamento is null) then
+	select (concat('Não há faturamento em ', exemplo_ano)) as mensagem;
+else
+	select (concat('Faturamento em ', exemplo_ano)) as mensagem;
+	select pro.nome_pro, sum(it.preco * it.quantidade) as faturamento
+	from produto pro join item it on pro.pk_produto = it.fk_produto
+	join ordem_servico os on os.pk_os = it.fk_os
+	where year(os.abertura_os) = exemplo_ano
+	group by pro.pk_produto
+	order by faturamento desc
+	limit 10;
+end if;
+end $$
+call exemplo (2020) $$
+--ta dando erro!?!
