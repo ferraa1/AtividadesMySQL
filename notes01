@@ -1,0 +1,814 @@
+mysql -u root -p
+root
+create database aula01;
+use aula01;
+show tables;
+status
+help
+create table diretoria(
+pk_diretoria int auto_increment,
+nome_dir varchar(50) not null,
+fone_dir varchar(14),
+primary key(pk_diretoria)
+);
+drop table diretoria;
+describe diretoria;
+create table departamento(
+pk_departamento int auto_increment,
+fk_diretoria int not null,
+nome_dep varchar(45),
+primary key(pk_departamento),
+foreign key(fk_diretoria)
+	references diretoria(pk_diretoria)
+	on delete restrict
+	on update cascade
+);
+--CRIE PRIMEIRO AS TABELAS SEM FK
+create table funcionario(
+pk_funcionario int auto_increment,
+fk_departamento int not null,
+nome_fun varchar(100),
+nascimento_fun date,
+sexo_fun set('f','m'),
+primary key(pk_funcionario),
+foreign key(fk_departamento)
+	references departamento(pk_departamento)
+	on delete restrict
+	on update cascade
+);
+create table dependente(
+pk_dependente int auto_increment,
+fk_funcionario int not null,
+nome_dep varchar(100),
+nascimento_dep date,
+sexo_dep set('f','m'),
+primary key(pk_dependente),
+foreign key(fk_funcionario)
+	references funcionario(pk_funcionario)
+	on delete restrict
+	on update cascade
+);
+create table salario(
+pk_salario int auto_increment,
+fk_funcionario int not null,
+valor_sal decimal(10,2),
+data_sal date,
+primary key(pk_salario),
+foreign key(fk_funcionario)
+	references funcionario(pk_funcionario)
+	on delete restrict
+	on update cascade
+);
+------------------------------------------------------------
+create table marca(
+pk_marca int auto_increment,
+nome_mar varchar(50) not null,
+primary key(pk_marca)
+);
+create table estado(
+pk_estado int auto_increment,
+nome_est varchar(25),
+sigla_est char(2),
+primary key(pk_estado)
+);
+create table modelo(
+pk_modelo int auto_increment,
+fk_marca int not null,
+nome_mod varchar(100),
+qtd_portas_mod int(11),
+ano_mod year,
+primary key(pk_modelo),
+foreign key(fk_marca)
+	references marca(pk_marca)
+	on delete restrict
+	on update cascade
+);
+create table cidade(
+pk_cidade int auto_increment,
+fk_estado int not null,
+nome_cid varchar(45),
+primary key(pk_cidade),
+foreign key(fk_estado)
+	references estado(pk_estado)
+	on delete restrict
+	on update cascade
+);
+create table fornecedor(
+pk_fornecedor int auto_increment,
+fk_cidade int not null,
+nome_for varchar(45),
+fone_for varchar(11),
+email_for varchar(45),
+primary key(pk_fornecedor),
+foreign key(fk_cidade)
+	references cidade(pk_cidade)
+	on delete restrict
+	on update cascade
+);
+create table cliente(
+pk_cliente int auto_increment,
+fk_cidade int not null,
+nome_cli varchar(100),
+email_cli varchar(45),
+fone_cli varchar(11),
+primary key(pk_cliente),
+foreign key(fk_cidade)
+	references cidade(pk_cidade)
+	on delete restrict
+	on update cascade
+);
+create table veiculo(
+pk_veiculo int auto_increment,
+fk_modelo int not null,
+fk_fornecedor int not null,
+placa_vei varchar(7),
+chassi_vei varchar(45),
+valor_compra_vei decimal(12,2),
+dt_compra_vei date,
+primary key(pk_veiculo),
+foreign key(fk_modelo)
+	references modelo(pk_modelo)
+	on delete restrict
+	on update cascade,
+foreign key(fk_fornecedor)
+	references fornecedor(pk_fornecedor)
+	on delete restrict
+	on update cascade
+);
+create table contrato(
+pk_contrato int auto_increment,
+fk_cliente int not null,
+fk_veiculo int not null,
+dt_con date,
+texto_con text,
+valor_con decimal(10,2),
+primary key(pk_contrato),
+foreign key(fk_cliente)
+	references cliente(pk_cliente)
+	on delete restrict
+	on update cascade,
+foreign key(fk_veiculo)
+	references veiculo(pk_veiculo)
+	on delete restrict
+	on update cascade
+);
+create table manutencao(
+pk_manutencao int auto_increment,
+fk_veiculo int not null,
+dt_man date,
+primary key(pk_manutencao),
+foreign key(fk_veiculo)
+	references veiculo(pk_veiculo)
+	on delete restrict
+	on update cascade
+);
+create table item(
+pk_item int auto_increment,
+descricao_ite varchar(45),
+tipo_ite set('p','s'),
+primary key(pk_item)
+);
+create table menu_item(
+fk_manutencao int not null,
+fk_item int not null,
+qtd_item int,
+valor_item decimal(10,2),
+primary key(fk_manutencao, fk_item),
+foreign key(fk_manutencao)
+	references manutencao(pk_manutencao)
+	on delete restrict
+	on update cascade,
+foreign key item(fk_item)
+	references item(pk_item)
+	on delete restrict
+	on update cascade
+);
+------------------------------------------------------------
+create table medico(
+pk_medico int auto_increment,
+nome_med varchar(45),
+especialidade_med varchar(45),
+primary key(pk_medico)
+);
+create table paciente(
+pk_paciente int auto_increment,
+nome_pac varchar(45),
+sexo_pac set('f','m'),
+nascimento_pac date,
+cpf_pac numeric(11),
+endereco_pac varchar(255),
+email_pac varchar(45),
+primary key(pk_paciente)
+);
+create table med_pac(
+fk_medico int not null,
+fk_paciente int not null,
+principal bool,
+primary key( fk_medico, fk_paciente),
+foreign key(fk_medico)
+	references medico(pk_medico)
+	on delete restrict
+	on update cascade,
+foreign key(fk_paciente)
+	references paciente(pk_paciente)
+	on delete restrict
+	on update cascade
+);
+create table receita(
+pk_receita int auto_increment,
+fk_medico int not null,
+fk_paciente int not null,
+data_rec date,
+primary key(pk_receita),
+foreign key(fk_medico)
+	references medico(pk_medico)
+	on delete restrict
+	on update cascade,
+foreign key(fk_paciente)
+	references paciente(pk_paciente)
+	on delete restrict
+	on update cascade
+);
+create table comp_quimico(
+pk_comp_quimico int auto_increment,
+nome_com varchar(45),
+primary key(pk_comp_quimico)
+);
+create table farmacia(
+pk_farmacia int auto_increment,
+nome_far varchar(45),
+primary key(pk_farmacia)
+);
+create table industria(
+pk_industria int auto_increment,
+nome_ind varchar(45),
+cnpj_ind numeric(16),
+fone_ind numeric(11),
+primary key(pk_industria)
+);
+create table contrato(
+pk_contrato int auto_increment,
+fk_industria int not null,
+fk_farmacia int not null,
+data_inicial_con date,
+data_final_con date,
+texto_con text,
+primary key(pk_contrato),
+foreign key(fk_industria)
+	references industria(pk_industria)
+	on delete restrict
+	on update cascade,
+foreign key(fk_farmacia)
+	references farmacia(pk_farmacia)
+	on delete restrict
+	on update cascade
+);
+create table remedio(
+pk_remedio int auto_increment,
+fk_industria int not null,
+nome_rem varchar(45),
+primary key(pk_remedio),
+foreign key(fk_industria)
+	references industria(pk_industria)
+	on delete restrict
+	on update cascade
+);
+create table far_rem(
+fk_farmacia int not null,
+fk_remedio int not null,
+preco decimal(10,2),
+primary key(fk_farmacia, fk_remedio),
+foreign key(fk_farmacia)
+	references farmacia(pk_farmacia)
+	on delete restrict
+	on update cascade,
+foreign key(fk_remedio)
+	references remedio(pk_remedio)
+	on delete restrict
+	on update cascade
+);
+create table com_rem(
+fk_comp_quimico int not null,
+fk_remedio int not null,
+quantidade int,
+primary key(fk_comp_quimico, fk_remedio),
+foreign key(fk_comp_quimico)
+	references comp_quimico(pk_comp_quimico)
+	on delete restrict
+	on update cascade,
+foreign key(fk_remedio)
+	references remedio(pk_remedio)
+	on delete restrict
+	on update cascade
+);
+create table rec_rem(
+fk_receita int not null,
+fk_remedio int not null,
+quantidade int,
+primary key(fk_receita, fk_remedio),
+foreign key(fk_receita)
+	references receita(pk_receita)
+	on delete restrict
+	on update cascade,
+foreign key(fk_remedio)
+	references remedio(pk_remedio)
+	on delete restrict
+	on update cascade
+);
+help select
+select * from medico;
+insert into medico(nome_med, especialidade_med) values
+('Fulano de Tal','pediatra'),
+('Beltrana','neurologista'),
+('Ciclano','cardiologista'),
+('Ciclana','clínica geral');
+insert into medico(nome_med) values
+('Fulana');
+insert into paciente(nome_pac, sexo_pac, nascimento_pac, cpf_pac, endereco_pac, email_pac) values
+('XÉssika','f','1503_01_20','01234567890','buraco','xsska.xxx@love.gov'),
+('Robert','m','1998_12_02','01234567890','SWEDEN','robbaz@love.gov'),
+('Amandash','f','2001_03_14','01234567890','apartamento','amandash@love.gov'),
+('BRUH','m','1203_01_10','01234567890','casinha','meme@meme.com');
+insert into comp_quimico (nome_com) values
+('lava'),
+('açúcar'),
+('sal'),
+('água');
+insert into farmacia (nome_far) values
+('MaryJane Corp'),
+('Med Inc'),
+('HelpForU'),
+('insertrandomfarmacianame');
+insert into industria (nome_ind, cnpj_ind, fone_ind) values
+('DrugMaker','0123456789012345','47555000555'),
+('Industry','0123456789012345','47555000555'),
+('PlantProcessing','0123456789012345','47555000555'),
+('Dorgas','0123456789012345','47555000555');
+select * from medico order by nome_med; --desc no final para ser ao contrário
+desc med_pac;
+------------------------------------------------------------
+delete from paciente;
+alter table farmacia change nome_far nomenomenome_far varchar(45);
+insert into contrato (fk_industria, fk_farmacia, data_inicial_con, data_final_con, texto_con) values
+('1','5','2018-01-01','2018-06-18','blá'),
+('2','4','2018-01-01','2018-06-18','bláblá'),
+('3','3','2018-01-01','2018-06-18','blábláblá'),
+('4','2','2018-01-01','2018-06-18','bláblábláblá'),
+('5','1','2018-01-01','2018-06-18','blábláblábláblá');
+show create table medico;
+insert into remedio (fk_industria, nome_rem) values
+('1','money'),
+('2','praquandocetamal'),
+('3','cecetameiomal'),
+('4','paquancetamuimal'),
+('5','sal filtrado');
+insert into receita (fk_medico, fk_paciente, data_rec) values
+('1','5','2018-06-18'),
+('2','4','2018-06-18'),
+('3','3','2018-06-18'),
+('4','2','2018-06-18'),
+('5','1','2018-06-18');
+insert into med_pac (fk_medico, fk_paciente, principal) values
+('1','5','0'),
+('2','4','1'),
+('3','3','0'),
+('4','2','1'),
+('5','1','0');
+insert into rec_rem (fk_receita, fk_remedio, quantidade) values
+('1','5','8001'),
+('2','4','200'),
+('3','3','3'),
+('4','2','16'),
+('5','1','450');
+insert into com_rem (fk_comp_quimico, fk_remedio, quantidade) values
+('1','5','8'),
+('2','4','90'),
+('3','3','10'),
+('4','2','2'),
+('5','1','405');
+insert into far_rem (fk_farmacia, fk_remedio, preco) values
+('1','5','1.5'),
+('2','4','2.5'),
+('3','3','5.0'),
+('4','2','9.9'),
+('5','1','299.9');
+------------------------------------------------------------
+create table endereco(
+pk_endereco int auto_increment,
+logradouro_end varchar(45),
+nro_end int,
+bairro_end varchar(45),
+cidade_end varchar(45),
+fone_end varchar(15),
+primary key(pk_endereco)
+);
+create table instrumento(
+pk_instrumento int auto_increment,
+nome_ins varchar(45),
+tom_ins varchar(5),
+primary key(pk_instrumento)
+);
+create table artista(
+pk_artista int auto_increment,
+fk_endereco int not null,
+nome_art varchar(45),
+nascimento_art date,
+sexo_art set('f','m'),
+primary key(pk_artista),
+foreign key(fk_endereco)
+	references endereco(pk_endereco)
+	on delete restrict
+	on update cascade
+);
+create table album(
+pk_album int auto_increment,
+fk_artista int not null,
+titulo_alb varchar(100),
+lancamento_alb date,
+obs_alb text,
+primary key(pk_album),
+foreign key(fk_artista)
+	references artista(pk_artista)
+	on delete restrict
+	on update cascade
+);
+create table musica(
+pk_musica int auto_increment,
+fk_album int not null,
+nome_mus varchar(45),
+duracao_mus decimal(5,2),
+letra_mus text,
+primary key(pk_musica),
+foreign key(fk_album)
+	references album(pk_album)
+	on delete restrict
+	on update cascade
+);
+create table art_mus(
+fk_artista int not null,
+fk_musica int not null,
+autor_mus bool,
+interprete_mus bool,
+primary key(fk_artista,fk_musica),
+foreign key(fk_artista)
+	references artista(pk_artista)
+	on delete restrict
+	on update cascade,
+foreign key(fk_musica)
+	references musica(pk_musica)
+	on delete restrict
+	on update cascade
+);
+create table art_ins(
+fk_artista int not null,
+fk_instrumento int not null,
+primary key(fk_artista,fk_instrumento),
+foreign key(fk_artista)
+	references artista(pk_artista)
+	on delete restrict
+	on update cascade,
+foreign key(fk_instrumento)
+	references instrumento(pk_instrumento)
+	on delete restrict
+	on update cascade
+);
+create table ins_mus(
+fk_instrumento int not null,
+fk_musica int not null,
+tom_musica varchar(10),
+primary key(fk_instrumento,fk_musica),
+foreign key(fk_instrumento)
+	references instrumento(pk_instrumento)
+	on delete restrict
+	on update cascade,
+foreign key(fk_musica)
+	references musica(pk_musica)
+	on delete restrict
+	on update cascade
+);
+insert into endereco(logradouro_end,nro_end,bairro_end,cidade_end,fone_end) values
+('ruazinha','123','centro','thatplace city','123456789012345'),
+('ruazona','321','quase centro','ibirama','123456789012345');
+insert into artista(fk_endereco,nome_art,nascimento_art,sexo_art) values
+('2','menino do pé preto','2001-12-15','m'),
+('1','cantora rex','1999-01-30','f');
+insert into album(fk_artista,titulo_alb,lancamento_alb,obs_alb) values
+('1','meu pé','2018-06-25','ele é preto'),
+('2','pedra','2018-06-25','fósseis são pedras');
+insert into musica(fk_album,nome_mus,duracao_mus,letra_mus) values
+('1','causa','0.5','meu pé é preto pela infecção e pela infecção meu pé é preto'),
+('2','dinos','60.0','DIIIIIINOOOOOOOSSAAAAAAAUUROOOOOOOOOOOOOOOOOOOOOS');
+insert into instrumento(nome_ins,tom_ins) values
+('kazoo','sla'),
+('tambor','sla');
+insert into art_mus(fk_artista,fk_musica,autor_mus,interprete_mus) values
+('1','1','1','1'),
+('2','2','1','0');
+insert into art_ins(fk_artista,fk_instrumento) values
+('1','2'),
+('2','1');
+insert into ins_mus(fk_instrumento,fk_musica,tom_musica) values
+('2','1','sla'),
+('1','2','sla');
+------------------------------------------------------------
+create table modelo(
+pk_modelo int auto_increment,
+descricao_mod varchar(45),
+passageiros_mod int,
+peso_mod int,
+primary key (pk_modelo)
+);
+create table controlador(
+pk_controlador int auto_increment,
+nome_con varchar(45),
+sexo_con set ('f','m'),
+primary key (pk_controlador)
+);
+create table tipo_teste(
+pk_tipo_teste int auto_increment,
+nro_anac_tip int,
+pont_max_tip int,
+primary key (pk_tipo_teste)
+);
+create table tecnico(
+pk_tecnico int auto_increment,
+nome_tec varchar(45),
+primary key (pk_tecnico)
+);
+create table aviao(
+pk_aviao int auto_increment,
+fk_modelo int not null,
+registro_avi varchar(45),
+fabric_avi date,
+primary key (pk_aviao),
+foreign key (fk_modelo)
+	references modelo(pk_modelo)
+	on delete restrict
+	on update cascade
+);
+create table teste(
+pk_teste int auto_increment,
+fk_tipo_teste int not null,
+pontuacao_tes int,
+data_tes date,
+primary key (pk_teste),
+foreign key (fk_tipo_teste)
+	references tipo_teste(pk_tipo_teste)
+	on delete restrict
+	on update cascade
+);
+create table tec_tes(
+fk_tecnico int not null,
+fk_teste int not null,
+horas_tec decimal (10,2),
+primary key (fk_tecnico,fk_teste),
+foreign key (fk_tecnico)
+	references tecnico(pk_tecnico)
+	on delete restrict
+	on update cascade,
+foreign key (fk_teste)
+	references teste(pk_teste)
+	on delete restrict
+	on update cascade
+);
+create table mod_tec(
+fk_modelo int not null,
+fk_tecnico int not null,
+experiencia_mod date,
+primary key (fk_modelo,fk_tecnico),
+foreign key (fk_modelo)
+	references modelo(pk_modelo)
+	on delete restrict
+	on update cascade,
+foreign key (fk_tecnico)
+	references tecnico(pk_tecnico)
+	on delete restrict
+	on update cascade
+);
+create table voo(
+pk_voo int auto_increment,
+fk_aviao int not null,
+fk_controlador int not null,
+data_voo date,
+hora_voo decimal (10,2),
+primary key (pk_voo),
+foreign key (fk_aviao)
+	references aviao(pk_aviao)
+	on delete restrict
+	on update cascade,
+foreign key (fk_controlador)
+	references controlador(pk_controlador)
+	on delete restrict
+	on update cascade
+);
+create table salario(
+pk_salario int auto_increment,
+fk_tecnico int not null,
+valor_sal decimal (10,2),
+data_sal date,
+primary key (pk_salario),
+foreign key (fk_tecnico)
+	references tecnico(pk_tecnico)
+	on delete restrict
+	on update cascade
+);
+--INSERT INTO tecnico (pk_tecnico,nome_tec) VALUES (1,'Rashad'),(2,'Kim'),(3,'Mercedes'),(4,'Oscar'),(5,'Jack'),(6,'Mara'),(7,'Fallon'),(8,'Amber'),(9,'Ezekiel'),(10,'Bianca');
+--INSERT INTO `salario` (`pk_salario`,`fk_tecnico`,`data_sal`) VALUES (1,8,"18-09-17"),(2,9,"18-04-30"),(3,2,"18-04-13"),(4,9,"18-02-27"),(5,9,"19-01-14"),(6,4,"18-08-14"),(7,4,"18-08-23"),(8,5,"18-09-19"),(9,5,"17-12-27"),(10,6,"19-03-21");
+------------------------------------------------------------ NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
+alter table tecnico
+add sexo set('f','m');
+alter table tecnico
+add nascimento date;
+alter table tecnico
+change sexo sexo_tec set('f','m');
+alter table tecnico
+ change nascimento nascimento_tec date;
+alter table tecnico
+ add obs_tec text;
+update tecnico
+set sexo_tec = 'f'
+where pk_tecnico <= 5;
+update tecnico
+set sexo_tec = 'm'
+where pk_tecnico > 5;
+update salario
+set valor_sal = 1000000
+where pk_salario = 7;
+show create table cliente;
+select cli.pk_cliente, cli.nome_cli
+from cidade cid join cliente cli on
+cid.pk_cidade = cli.fk_cidade
+where cid.nome_cid = 'Joinville'
+order by 2;
+select col.nome_col, cid.nome_cid, col.nasc_col
+from cidade cid join colaborador col on
+cid.pk_cidade = col.fk_cidade
+where col.nasc_col >= '1990-01-01'
+and col.nasc_col <= '1990-12-31'
+and (cid.nome_cid = 'Blumenau'
+or cid.nome_cid = 'Joinville')
+order by 1;
+select pro.pk_produto, pro.nome_pro
+from produto pro join marca mar on
+pro.fk_marca = mar.pk_marca
+where mar.nome_mar in('Bosch','Makita')
+order by 2;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`paciente` (
+  `pk_paciente` INT NOT NULL AUTO_INCREMENT,
+  `cpf_pac` DECIMAL(11) NULL,
+  `nome_pac` VARCHAR(45) NULL,
+  `endereco_pac` VARCHAR(100) NULL,
+  `nascimento_pac` DATE NULL,
+  PRIMARY KEY (`pk_paciente`))
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`medico` (
+  `pk_medico` INT NOT NULL AUTO_INCREMENT,
+  `cpf_med` DECIMAL(11) NULL,
+  `nome_med` VARCHAR(45) NULL,
+  `espec_med` VARCHAR(45) NULL,
+  `inicio_prof_med` DATE NULL,
+  PRIMARY KEY (`pk_medico`))
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`med_pac` (
+  `fk_medico` INT NOT NULL,
+  `fk_paciente` INT NOT NULL,
+  `principal` TINYINT(1) NULL,
+  PRIMARY KEY (`fk_medico`, `fk_paciente`),
+      FOREIGN KEY (`fk_medico`)
+    REFERENCES `farmacia17`.`medico` (`pk_medico`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+      FOREIGN KEY (`fk_paciente`)
+    REFERENCES `farmacia17`.`paciente` (`pk_paciente`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`receita` (
+  `pk_receita` INT NOT NULL AUTO_INCREMENT,
+  `fk_paciente` INT NOT NULL,
+  `fk_medico` INT NOT NULL,
+  `dt_rec` DATE NULL,
+  PRIMARY KEY (`pk_receita`),
+  INDEX `fk_receita1_idx` (`fk_paciente` ASC),
+  INDEX `fk_receita2_idx` (`fk_medico` ASC),
+  CONSTRAINT `fk_receita1`
+    FOREIGN KEY (`fk_paciente`)
+    REFERENCES `farmacia17`.`paciente` (`pk_paciente`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_receita2`
+    FOREIGN KEY (`fk_medico`)
+    REFERENCES `farmacia17`.`medico` (`pk_medico`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`industria` (
+  `pk_industria` INT NOT NULL AUTO_INCREMENT,
+  `cnpj_ind` DECIMAL(16) NULL,
+  `nome_ind` VARCHAR(45) NULL,
+  `telefone_ind` DECIMAL(10) NULL,
+  PRIMARY KEY (`pk_industria`))
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`remedio` (
+  `pk_remedio` INT NOT NULL AUTO_INCREMENT,
+  `fk_industria` INT NOT NULL,
+  `nome_rem` VARCHAR(45) NULL,
+  `formula_rem` TEXT NULL,
+  PRIMARY KEY (`pk_remedio`),
+  INDEX `fk_remedio1_idx` (`fk_industria` ASC),
+  CONSTRAINT `fk_remedio1`
+    FOREIGN KEY (`fk_industria`)
+    REFERENCES `farmacia17`.`industria` (`pk_industria`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`rec_rem` (
+  `fk_receita` INT NOT NULL,
+  `fk_remedio` INT NOT NULL,
+  `quantidade` INT NULL,
+  PRIMARY KEY (`fk_receita`, `fk_remedio`),
+  INDEX `fk_receita_remedio2_idx` (`fk_remedio` ASC),
+  INDEX `fk_receita_remedio1_idx` (`fk_receita` ASC),
+  CONSTRAINT `fk_receita_remedio1`
+    FOREIGN KEY (`fk_receita`)
+    REFERENCES `farmacia17`.`receita` (`pk_receita`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_receita_remedio2`
+    FOREIGN KEY (`fk_remedio`)
+    REFERENCES `farmacia17`.`remedio` (`pk_remedio`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+create table comp_quimico(
+pk_comp_quimico int auto_increment,
+nome_com varchar(200) not null,
+primary key (pk_comp_quimico)
+);
+
+create table comp_rem(
+fk_comp_quimico int not null,
+fk_remedio int not null,
+primary key (fk_comp_quimico, fk_remedio),
+foreign key (fk_comp_quimico) references comp_quimico(pk_comp_quimico) on delete restrict on update cascade,
+foreign key (fk_remedio) references remedio(pk_remedio) on delete restrict on update cascade
+);
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`farmacia` (
+  `pk_farmacia` INT NOT NULL AUTO_INCREMENT,
+  `nome_far` VARCHAR(45) NULL,
+  `endereco_far` VARCHAR(45) NULL,
+  `telefone_far` DECIMAL(10) NULL,
+  PRIMARY KEY (`pk_farmacia`))
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`contrato` (
+  `pk_contrato` INT NOT NULL AUTO_INCREMENT,
+  `fk_farmacia` INT NOT NULL,
+  `fk_industria` INT NOT NULL,
+  `dt_inicio_con` DATE NULL,
+  `dt_final_con` DATE NULL,
+  `texto_con` TEXT NULL,
+  `supervisor_con` VARCHAR(45) NULL,
+  PRIMARY KEY (`pk_contrato`),
+  INDEX `fk_contrato1_idx` (`fk_farmacia` ASC),
+  INDEX `fk_contrato2_idx` (`fk_industria` ASC),
+  CONSTRAINT `fk_contrato1`
+    FOREIGN KEY (`fk_farmacia`)
+    REFERENCES `farmacia17`.`farmacia` (`pk_farmacia`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_contrato2`
+    FOREIGN KEY (`fk_industria`)
+    REFERENCES `farmacia17`.`industria` (`pk_industria`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS `farmacia17`.`far_rem` (
+  `fk_farmacia` INT NOT NULL,
+  `fk_remedio` INT NOT NULL,
+  `preco` DECIMAL(10,2) NULL,
+  PRIMARY KEY (`fk_farmacia`, `fk_remedio`),
+  INDEX `fk_farmacia_remedio2_idx` (`fk_remedio` ASC),
+  INDEX `fk_farmacia_remedio1_idx` (`fk_farmacia` ASC),
+  CONSTRAINT `fk_farmacia_remedio1`
+    FOREIGN KEY (`fk_farmacia`)
+    REFERENCES `farmacia17`.`farmacia` (`pk_farmacia`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_farmacia_remedio2`
+    FOREIGN KEY (`fk_remedio`)
+    REFERENCES `farmacia17`.`remedio` (`pk_remedio`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT)
+ENGINE = InnoDB;

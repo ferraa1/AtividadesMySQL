@@ -1,0 +1,373 @@
+update
+set
+where;
+alter table
+add;
+alter table
+change;
+select distinct
+from join on
+where and or
+order by;
+
+--modify
+--rename
+
+--delete from tecnico where pk_tecnico = 101;
+--select count(*) from salario;
+--update salario set valor_sal = valor_sal * 1.2 where pk_salario = 2;
+
+select cli.pk_cliente, cli.nome_cli
+from cidade cid join cliente cli on
+cid.pk_cidade = cli.fk_cidade
+where cid.nome_cid = 'Joinville'
+order by 2;
+
+select col.nome_col, cid.nome_cid, col.nasc_col
+from cidade cid join colaborador col on
+cid.pk_cidade = col.fk_cidade
+where col.nasc_col >= '1990-01-01'
+and col.nasc_col <= '1990-12-31' -- ou and year(col.nome_cid)= 1990 ou and col.nasc_col like '1990-%-%'
+and (cid.nome_cid = 'Blumenau'
+or cid.nome_cid = 'Joinville') -- ou where cid.nome_cid in('Joinville','Blumenau')
+order by 1;
+
+select pro.pk_produto, pro.nome_pro, mar.nome_mar, pro.preco_pro
+from produto pro join marca mar on
+pro.fk_marca = mar.pk_marca
+where mar.nome_mar in('Bosch','Makita')
+and pro.preco_pro >= 50
+and pro.preco_pro <= 100
+order by 2;
+
+select distinct fo.razao_for
+from marca mar join produto pro on mar.pk_marca = pro.fk_marca
+join forn_prod fp on pro.pk_produto = fp.fk_produto
+join fornecedor fo on fo.pk_fornecedor = fp.fk_fornecedor
+where mar.nome_mar = 'Makita'
+order by fo.razao_for;
+
+select distinct cli.nome_cli
+from cliente cli join cidade cid on cid.pk_cidade = cli.fk_cidade
+join ordem_servico os on cli.pk_cliente = os.fk_cliente
+where cid.nome_cid in ('São Paulo','Rio de Janeiro','Porto Alegre')
+and year(os.abertura_os) = 2010
+order by 1;
+--
+alter table colaborador
+add nome varchar(45);
+
+alter table colaborador
+change nome nome_col varchar(45);
+
+update colaborador
+set nome_col = 'Júlio Werner Zanatta Koepsel'
+where pk_colaborador = 1;
+
+select distinct cli.nome_cli,os.abertura_os,col.nome_col
+from cliente cli join ordem_servico os on cli.pk_cliente = os.fk_cliente
+join colaborador col on os.fk_colaborador = col.pk_colaborador
+where col.nome_col = 'Júlio Werner Zanatta Koepsel'
+and year(os.abertura_os) = 2000
+order by 1;
+
+alter table colaborador
+drop nome_col;
+--
+select pro.nome_pro,mar.nome_mar,cat.nome_cat
+from produto pro join marca mar on pro.fk_marca = mar.pk_marca
+join categoria cat on pro.fk_categoria = cat.pk_categoria
+where mar.nome_mar in('Gong','Makita')
+and cat.nome_cat = 'motoserras'
+order by 1;
+
+update cliente
+set nome_cli = 'André'
+where pk_cliente = 10;
+
+select distinct pk_os
+from ordem_servico os join item it on os.pk_os = it.fk_os
+join produto pr on it.fk_produto = pr.pk_produto
+where year(os.abertura_os) = 2000 and pr.preco_pro > 500
+order by 1;
+
+select pk_produto, nome_pro
+from produto
+where preco_pro >= 300 and preco_pro <= 500 and icms_pro = 17
+order by 1;
+
+select nome_col
+from colaborador
+where year(nasc_col) between 1980 and 1990
+order by 1;
+
+select nome_cli, pk_cliente
+from cliente
+where year(cadastro_cli) = 2000
+order by 2 desc;
+
+select pro.nome_pro
+from produto pro join marca mar on pro.fk_marca = mar.pk_marca
+where mar.nome_mar = 'Bosch' and pro.preco_pro > 100
+order by 1;
+
+select os.pk_os, cli.nome_cli
+from ordem_servico os join cliente cli on os.fk_cliente = cli.pk_cliente
+where cli.nome_cli like 'Elvis%'
+order by 1;
+
+select distinct forn.razao_for, forn.email_for, cid.nome_cid
+from fornecedor forn join cidade cid on cid.pk_cidade = forn.fk_cidade
+where cid.nome_cid in('São Paulo','Rio de Janeiro','Natal')
+order by 1;
+
+select os.pk_os, col.nome_col
+from ordem_servico os join colaborador col on col.pk_colaborador = os.fk_colaborador
+where col.nome_col like 'Emma%' and year(os.abertura_os) between 2000 and 2001
+order by 1;
+
+select distinct cli.nome_cli
+from cliente cli join ordem_servico os on cli.pk_cliente = os.fk_cliente
+join item ite on os.pk_os = ite.fk_os
+join produto pro on ite.fk_produto = pro.pk_produto
+join marca mar on pro.fk_marca = mar.pk_marca
+join cidade cid on cid.pk_cidade = cli.fk_cidade
+where cid.nome_cid in('Ibirama','Dona Emma','Rio do Sul','Presidente Getúlio') and mar.nome_mar = 'Makita' and year(os.abertura_os) = 2018
+order by 1;
+
+update colaborador
+set nome_col = 'Júlio'
+where pk_colaborador = 1;
+
+select cli.nome_cli
+from cliente cli join cidade cid on cli.fk_cidade = cid.pk_cidade
+join colaborador col on col.fk_cidade = cid.pk_cidade
+join ordem_servico os on col.pk_colaborador = os.fk_colaborador
+where col.nome_col = 'Júlio' and cid.nome_cid = 'Ibirama' and year(os.abertura_os) = 2017
+order by 1;
+
+select distinct pro.nome_pro
+from produto pro join forn_prod fopr on
+
+update controlador
+set nome_con = 'Julio', sexo_con = 'm'
+where pk_controlador = 1;
+
+select distinct mo.descricao_mod
+from controlador con join voo vo on con.pk_controlador = vo.fk_controlador
+join aviao avi on avi.pk_aviao = vo.fk_aviao
+join modelo mo on mo.pk_modelo = avi.fk_modelo
+where con.pk_controlador = 1 and vo.data_voo like('2017-%-%')
+order by 1;
+
+select tec.nome_tec
+from aviao av join modelo mo on mo.pk_modelo = av.fk_modelo
+join mod_tec mt on mo.
+order by 1;
+
+select tec.nome_tec, mt.experiencia
+from tecnico tec join mod_tec mt on tec.pk_tecnico = mt.fk_tecnico
+join modelo mo on mo.pk_modelo = mt.fk_modelo
+where mo.descricao_mod = 'Airbus 757'
+order by 2
+limit 5;
+
+select tec.nome_tec
+from tecnico tec join tec_tes tt on tec.pk_tecnico = tt.fk_tecnico
+join teste tes on tes.pk_teste = tt.fk_teste
+join tipo_teste tipo on tipo.pk_tipo_teste = tes.fk_tipo_teste
+where tipo.pont_max_tip = tes.pontuacao_tes
+and year(tes.data_tes) = 2018
+order by 1;
+
+--SELECT con.nome_con
+--FROM controlador con JOIN voo vo ON con.pk_controlador = vo.fk_controlador
+--JOIN aviao avi ON avi.pk_aviao = vo.fk_aviao
+--JOIN modelo mo ON mo.pk_modelo = avi.fk_modelo
+--WHERE con.sexo_con = 'm' AND
+--ORDER BY 1;
+
+Revisão para prova de SQL
+
+1) Liste alfabeticamente o nome dos médicos que receitaram neste ano o remédio "Cura tuto".
+
+2) Liste o nome das pacientes do sexo feminino que nasceram entre 2000 e 2005, mas apenas as que residam na cidade de Ibirama.
+
+3) Liste o nome das indústrias que utilizam o componente químico urânio em seus medicamentos;
+
+4) Liste o nome das farmácias que tiveram contratos abertos entre 2015 e 2017, mas apenas com a indústria Tabajara Ltda.
+
+5)Faça o comando para cadastrar você como um dos médicos cadastrados na base de dados. Liste o nome de todos os pacientes que você atendeu neste mês, mas apenas os que você receitou o remédio "Cura tuto".
+
+6)Liste alfabeticamente o nome dos remédios que tiveram mais de 10 unidades registradas nas receitas emitidas no mês passado.
+
+7)Faça o comando para retirar o atributo inicio_prof_med da tabela medico e outro para retirar o cpf do paciente.
+
+8) Faça o comando para renomear a tabela comp_rem para com_rem.
+
+9) liste alfabeticamente o nome dos pacientes que compraram remédios na farmácia 'Preço Bom', mas apenas os fabricados pela industria 'Tabajara Ltda.'.
+
+alter table contrato
+change dt_inicio_con data_inicial_con date,
+change dt_final_con data_final_con date;
+
+alter table receita
+change dt_rec data_rec date;
+
+alter table paciente
+add sexo_pac set('f','m');
+
+select distinct med.nome_med
+from medico med join receita rec on med.pk_medico = rec.fk_medico
+join rec_rem rr on rec.pk_receita = rr.fk_receita
+join remedio rem on rem.pk_remedio = rr.fk_remedio
+where rem.nome_rem = 'Cura tuto'
+and year(rec.data_rec) = 2018
+order by 1;
+
+select distinct nome_pac
+from paciente
+where sexo_pac = 'f'
+and endereco_pac like '%Ibirama%'
+and year(nascimento_pac) between 2000 and 2005
+order by 1;
+
+select ind.nome_ind
+from industria ind join remedio rem on ind.pk_industria = rem.fk_industria
+join comp_rem cr on rem.pk_remedio = cr.fk_remedio
+join comp_quimico cq on cq.pk_comp_quimico = cr.fk_comp_quimico
+where cq.nome_com = 'urânio'
+order by 1;
+
+select far.nome_far
+from farmacia far join contrato con on far.pk_farmacia = con.fk_farmacia
+join industria ind on ind.pk_industria = con.fk_industria
+where ind.nome_ind = 'Tabajara Ltda.'
+and year(con.data_inicial_con) between 2015 and 2017
+order by 1;
+--------------------------------------------------------------------------------
+alter table medico
+change espec_med especialidade_med varchar(45);
+
+insert into medico (nome_med, especialidade_med) values
+('Fulano','Dedão do pé direito');
+
+update medico
+set nome_med = 'Júlio'
+where pk_medico = 1;
+
+select pac.nome_pac
+from paciente pac join receita rec on pac.pk_paciente = rec.fk_paciente
+join medico med on med.pk_medico = rec.fk_medico
+join rec_rem rr on rec.pk_receita = rr.fk_receita
+join remedio rem on rem.pk_remedio = rr.fk_remedio
+where med.nome_med = 'Júlio'
+and rec.data_rec like '2018-10-%'
+and rem.nome_rem = 'Cura tuto'
+order by 1;
+------------------------------------------------------------------------------
+select rem.nome_rem
+from remedio rem join rec_rem rr on rem.pk_remedio = rr.fk_remedio
+join receita rec on rec.pk_receita = rr.fk_receita
+where rr.quantidade > 10
+and rec.data_rec like '2018-09-%'
+order by 1;
+
+select art.nome_art, art.nascimento_art
+from artista art join endereco ende on ende.pk_endereco = art.fk_endereco
+join art_ins arin on art.pk_artista = arin.fk_artista
+join instrumento ins on ins.pk_instrumento = arin.fk_instrumento
+where ende.cidade_end in ('Ibirama','Rio do Sul','Dona Emma','Apiúna')
+and ins.nome_ins = 'guitarra'
+order by 2 desc;
+
+select mus.nome_mus
+from album alb join musica mus on alb.pk_album = mus.fk_album
+join art_mus armu on mus.pk_musica = armu.fk_musica
+join artista art on art.pk_artista = armu.fk_artista
+where armu.autor_mus = 'false'
+and armu.interprete_mus = 'true'
+and year(alb.lancamento_alb) between 2005 and 2015
+order by 1;
+
+alter table art_mus
+add autor_mus bool,
+add interprete_mus bool;
+
+select art.nome_art
+from artista art join endereco ende on ende.pk_endereco = art.fk_endereco
+join art_ins arin on art.pk_artista = arin.fk_artista
+join instrumento ins on ins.pk_instrumento = arin.fk_instrumento
+where ins.nome_ins in ('bateria','baixo','guitarra','gaita de fole','zabumba')
+and ende.cidade_end in ('São Paulo','Rio de Janeiro','Florianópolis','Curitiba','Belo Horizonte')
+and year(art.nascimento_art) between 1990 and 200
+order by 1;
+
+select distinct pro.nome_pro
+from produto pro join forn_prod fopr on pro.pk_produto = fopr.fk_produto
+join fornecedor forn on forn.pk_fornecedor = fopr.fk_fornecedor
+join cidade cid on cid.pk_cidade = forn.fk_cidade
+where cid.nome_cid = 'Ibirama'
+order by 1;
+
+select cli.nome_cli
+from cliente cli join cidade cid on cid.pk_cidade = cli.fk_cidade
+where cid.nome_cid not in ('Ibirama','Dona Emma','Rio do Sul','Presidente Getúlio')
+order by 1;
+
+select pro.nome_pro
+from produto pro join marca mar on mar.pk_marca = pro.fk_marca
+join item ite on pro.pk_produto = ite.fk_produto
+join ordem_servico os on os.pk_os = ite.fk_os
+join cliente cli on cli.pk_cliente = os.fk_cliente
+join colaborador col on col.pk_colaborador = os.fk_colaborador
+where mar.nome_mar = 'Makita'
+and year(os.abertura_os) = 2018
+and col.nome_col = 'Júlio Werner Zanatta Koepsel'
+order by 1;
+
+select tec.nome_tec
+from tecnico tec join mod_tec mote on tec.pk_tecnico = mote.fk_tecnico
+join modelo mo on mo.pk_modelo = mote.fk_modelo
+where mo.descricao_mod = 'Airbus 747'
+order by mote.experiencia limit 5;-----------------------------------------------------------
+
+select tec.nome_tec
+from tecnico tec join tec_tes tete on tec.pk_tecnico = tete.fk_tecnico
+join teste tes on tes.pk_teste = tete.fk_teste
+join tipo_teste tite on tite.pk_tipo_teste = tes.fk_tipo_teste
+where tes.pontuacao_tes = tite.pont_max_tip
+and year(tes.data_tes) = 2018
+order by 1;
+
+select distinct mo.descricao_mod
+from modelo mo join aviao avi on mo.pk_modelo = avi.fk_modelo
+join voo vo on avi.pk_aviao = vo.fk_aviao
+join controlador con on con.pk_controlador = vo.fk_controlador
+where con.nome_con = 'Júlio Werner Zanatta Koepsel'
+and vo.data_voo like '2018-08-%'
+order by 1;
+
+select tec.nome_tec
+from tecnico tec join tec_tes tete on tec.pk_tecnico = tete.fk_tecnico
+join teste tes on tes.pk_teste = tete.fk_teste
+where tes.pontuacao_tes > 100
+and year(tes.data_tes) = 2018
+and tete.horas_tec > 50
+order by 1;
+
+select tec.nome_tec
+from tecnico tec join mod_tec mote on tec.pk_tecnico = mote.fk_tecnico
+join modelo mo on mo.pk_modelo = mote.fk_modelo
+where year(mote.experiencia) >= 2000
+and mo.passageiros_mod > 200
+order by 1;
+
+select mo.descricao_mod
+from modelo mo join aviao avi on mo.pk_modelo = avi.fk_modelo
+join teste tes on avi.pk_aviao = tes.fk_aviao
+join tipo_teste tite on tite.pk_tipo_teste = tes.fk_tipo_teste
+join voo vo on avi.pk_aviao = vo.fk_aviao
+where vo.data_voo like '2018-11-%'
+and tes.pontuacao_tes = tite.pont_max_tip
+order by 1;
